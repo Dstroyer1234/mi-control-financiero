@@ -22,18 +22,23 @@ jobs:
 
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
+
+      - name: Instalar componentes Android
+        run: |
+          sdkmanager --install "platform-tools"
+          sdkmanager --install "platforms;android-35"
+          sdkmanager --install "build-tools;35.0.0"
+          yes | sdkmanager --licenses
+
+      - name: Comprobar Gradle Wrapper
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "Falta gradlew en la raíz del proyecto"
+            exit 1
+          fi
 
       - name: Compilar APK
         run: |
-          if [ ! -f gradlew ]; then
-            echo "ERROR: Falta el archivo gradlew en la raíz del proyecto."
-            exit 1
-          fi
           chmod +x gradlew
           ./gradlew assembleDebug
 
