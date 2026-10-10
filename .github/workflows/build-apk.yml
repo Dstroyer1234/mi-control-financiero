@@ -22,13 +22,24 @@ jobs:
 
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Instalar componentes Android
-        run: |
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-          yes | sdkmanager --licenses
+        with:
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
 
       - name: Compilar APK
         run: |
+          if [ ! -f gradlew ]; then
+            echo "ERROR: Falta el archivo gradlew en la raíz del proyecto."
+            exit 1
+          fi
           chmod +x gradlew
           ./gradlew assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mi-Control-Financiero-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
